@@ -19,8 +19,8 @@ type Msg struct {
 
 1. Topics - string array (slice) with topics to join or leave
 2. Command - string, command to apply on the provided topics
-3. Broker - string, pub-sub broker to use, for the one-node systems might be used `memory` broker or `redis`. For the multi-node -
-`redis` broker should be used.
+3. Broker - string, pub-sub broker to use, for the one-node systems might be used `memory` broker or `redis`.
+For the multi-node - `redis` broker should be used.
 4. Payload - raw byte array to send to the subscribers (binary messages).
 
 

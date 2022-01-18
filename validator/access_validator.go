@@ -52,9 +52,6 @@ type Request struct {
 
 	// Attributes can be set by chained mdwr to safely pass value from Golang to PHP. See: GetAttribute, SetAttribute functions.
 	Attributes map[string]interface{} `json:"attributes"`
-
-	// request body can be parsedData or []byte
-	body interface{}
 }
 
 func ServerAccessValidator(r *http.Request) ([]byte, error) {

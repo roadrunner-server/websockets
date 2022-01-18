@@ -58,7 +58,7 @@ func NewExecutor(conn *connection.Connection, log *zap.Logger,
 	}
 }
 
-func (e *Executor) StartCommandLoop() error { //nolint:gocognit
+func (e *Executor) StartCommandLoop() error { //nolint:gocyclo,gocognit
 	const op = errors.Op("executor_command_loop")
 	for {
 		data, opCode, err := e.conn.Read()
@@ -104,13 +104,13 @@ func (e *Executor) StartCommandLoop() error { //nolint:gocognit
 				packet, errJ := json.Marshal(resp)
 				if errJ != nil {
 					e.log.Error("marshal the body", zap.Error(errJ))
-					return errors.E(op, fmt.Errorf("%v,%v", err, errJ))
+					return errors.E(op, fmt.Errorf("%w,%v", err, errJ))
 				}
 
 				errW := e.conn.Write(packet)
 				if errW != nil {
 					e.log.Error("write payload to the connection", zap.ByteString("payload", packet), zap.Error(errW))
-					return errors.E(op, fmt.Errorf("%v,%v", err, errW))
+					return errors.E(op, fmt.Errorf("%w,%v", err, errW))
 				}
 
 				continue
