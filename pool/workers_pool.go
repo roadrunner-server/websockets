@@ -3,7 +3,7 @@ package pool
 import (
 	"sync"
 
-	json "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 	"github.com/roadrunner-server/api/v2/plugins/pubsub"
 	"github.com/roadrunner-server/sdk/v2/utils"
 	"github.com/roadrunner-server/websockets/v2/connection"
