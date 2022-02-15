@@ -8,18 +8,20 @@ import (
 	"github.com/gobwas/ws"
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
+	"github.com/roadrunner-server/api/v2/payload"
 	"github.com/roadrunner-server/api/v2/plugins/config"
 	"github.com/roadrunner-server/api/v2/plugins/pubsub"
 	"github.com/roadrunner-server/api/v2/plugins/server"
+	"github.com/roadrunner-server/api/v2/pool"
+	"github.com/roadrunner-server/api/v2/state/process"
+	"github.com/roadrunner-server/api/v2/worker"
 	"github.com/roadrunner-server/errors"
-	"github.com/roadrunner-server/sdk/v2/payload"
-	phpPool "github.com/roadrunner-server/sdk/v2/pool"
-	"github.com/roadrunner-server/sdk/v2/state/process"
-	"github.com/roadrunner-server/sdk/v2/worker"
+	poolImpl "github.com/roadrunner-server/sdk/v2/pool"
+	processImpl "github.com/roadrunner-server/sdk/v2/state/process"
 	"github.com/roadrunner-server/websockets/v2/attributes"
 	"github.com/roadrunner-server/websockets/v2/connection"
 	"github.com/roadrunner-server/websockets/v2/executor"
-	"github.com/roadrunner-server/websockets/v2/pool"
+	wsPool "github.com/roadrunner-server/websockets/v2/pool"
 	"github.com/roadrunner-server/websockets/v2/validator"
 	"go.uber.org/zap"
 )
@@ -47,12 +49,12 @@ type Plugin struct {
 	connections sync.Map
 
 	// GO workers pool
-	workersPool *pool.WorkersPool
+	workersPool *wsPool.WorkersPool
 
 	serveExit chan struct{}
 
 	// workers pool
-	phpPool phpPool.Pool
+	phpPool pool.Pool
 	// payloads pool
 	pldPool sync.Pool
 	// server which produces commands to the pool
@@ -120,14 +122,14 @@ func (p *Plugin) Serve() chan error {
 		p.Lock()
 		defer p.Unlock()
 
-		p.phpPool, err = p.server.NewWorkerPool(context.Background(), &phpPool.Config{
+		p.phpPool, err = p.server.NewWorkerPool(context.Background(), &poolImpl.Config{
 			Debug:           p.cfg.Pool.Debug,
 			NumWorkers:      p.cfg.Pool.NumWorkers,
 			MaxJobs:         p.cfg.Pool.MaxJobs,
 			AllocateTimeout: p.cfg.Pool.AllocateTimeout,
 			DestroyTimeout:  p.cfg.Pool.DestroyTimeout,
 			Supervisor:      p.cfg.Pool.Supervisor,
-		}, map[string]string{RrMode: "http", RrBroadcastPath: p.cfg.Path})
+		}, map[string]string{RrMode: "http", RrBroadcastPath: p.cfg.Path}, nil)
 		if err != nil {
 			errCh <- errors.E(op, err)
 			return
@@ -136,7 +138,7 @@ func (p *Plugin) Serve() chan error {
 		p.accessValidator = p.defaultAccessValidator()
 	}()
 
-	p.workersPool = pool.NewWorkersPool(p.subReader, &p.connections, p.log)
+	p.workersPool = wsPool.NewWorkersPool(p.subReader, &p.connections, p.log)
 
 	// we need here only Reader part of the interface
 	go func(ps pubsub.Reader) {
@@ -260,7 +262,7 @@ func (p *Plugin) Workers() []*process.State {
 
 	ps := make([]*process.State, 0, len(workers))
 	for i := 0; i < len(workers); i++ {
-		state, err := process.WorkerProcessState(workers[i])
+		state, err := processImpl.WorkerProcessState(workers[i])
 		if err != nil {
 			return nil
 		}
