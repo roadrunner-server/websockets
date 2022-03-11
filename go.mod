@@ -6,9 +6,9 @@ require (
 	github.com/gobwas/ws v1.1.0
 	github.com/goccy/go-json v0.9.5
 	github.com/google/uuid v1.3.0
-	github.com/roadrunner-server/api/v2 v2.10.0
+	github.com/roadrunner-server/api/v2 v2.11.0
 	github.com/roadrunner-server/errors v1.1.1
-	github.com/roadrunner-server/sdk/v2 v2.10.0
+	github.com/roadrunner-server/sdk/v2 v2.10.1
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/zap v1.21.0
 )
@@ -28,7 +28,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
+	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
