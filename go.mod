@@ -1,6 +1,6 @@
 module github.com/roadrunner-server/websockets/v2
 
-go 1.17
+go 1.18
 
 require (
 	github.com/gobwas/ws v1.1.0
