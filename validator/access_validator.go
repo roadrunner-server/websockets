@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/goccy/go-json"
@@ -79,6 +80,13 @@ func ServerAccessValidator(r *http.Request) ([]byte, error) {
 		Attributes: attributes.All(r),
 	}
 
+	for _, c := range r.Cookies() {
+		v, errC := url.QueryUnescape(c.Value)
+		if errC == nil {
+			req.Cookies[c.Name] = v
+		}
+	}
+
 	data, err := json.Marshal(req)
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -109,6 +117,13 @@ func TopicsAccessValidator(r *http.Request, topics ...string) ([]byte, error) {
 		Cookies:    make(map[string]string),
 		RawQuery:   rq,
 		Attributes: attributes.All(r),
+	}
+
+	for _, c := range r.Cookies() {
+		v, errC := url.QueryUnescape(c.Value)
+		if errC == nil {
+			req.Cookies[c.Name] = v
+		}
 	}
 
 	data, err := json.Marshal(req)
