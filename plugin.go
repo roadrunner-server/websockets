@@ -18,11 +18,13 @@ import (
 	"github.com/roadrunner-server/errors"
 	poolImpl "github.com/roadrunner-server/sdk/v2/pool"
 	processImpl "github.com/roadrunner-server/sdk/v2/state/process"
+	"github.com/roadrunner-server/sdk/v2/utils"
 	"github.com/roadrunner-server/websockets/v2/attributes"
 	"github.com/roadrunner-server/websockets/v2/connection"
 	"github.com/roadrunner-server/websockets/v2/executor"
 	wsPool "github.com/roadrunner-server/websockets/v2/pool"
 	"github.com/roadrunner-server/websockets/v2/validator"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
 
@@ -176,6 +178,13 @@ func (p *Plugin) Name() string {
 
 func (p *Plugin) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if val, ok := r.Context().Value(utils.OtelTracerNameKey).(string); ok {
+			tp := trace.SpanFromContext(r.Context()).TracerProvider()
+			ctx, span := tp.Tracer(val).Start(r.Context(), PluginName)
+			defer span.End()
+			r = r.WithContext(ctx)
+		}
+
 		if r.URL.Path != p.cfg.Path {
 			next.ServeHTTP(w, r)
 			return
