@@ -8,11 +8,11 @@ import (
 	"github.com/gobwas/ws"
 	"github.com/goccy/go-json"
 	"github.com/roadrunner-server/api/v2/plugins/pubsub"
-	websocketsv1 "github.com/roadrunner-server/api/v2/proto/websockets/v1beta"
 	"github.com/roadrunner-server/errors"
 	"github.com/roadrunner-server/websockets/v2/commands"
 	"github.com/roadrunner-server/websockets/v2/connection"
 	"github.com/roadrunner-server/websockets/v2/validator"
+	websocketsProto "go.buf.build/protocolbuffers/go/roadrunner-server/api/proto/websockets/v1"
 	"go.uber.org/zap"
 )
 
@@ -71,7 +71,7 @@ func (e *Executor) StartCommandLoop() error { //nolint:gocyclo,gocognit
 			return nil
 		}
 
-		msg := &websocketsv1.Message{}
+		msg := &websocketsProto.Message{}
 
 		err = json.Unmarshal(data, msg)
 		if err != nil {
