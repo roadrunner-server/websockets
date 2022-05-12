@@ -79,12 +79,6 @@ func (e *Executor) StartCommandLoop() error { //nolint:gocyclo,gocognit
 			continue
 		}
 
-		// nil message, continue
-		if msg == nil {
-			e.log.Debug("nil message, skipping")
-			continue
-		}
-
 		switch msg.Command {
 		// handle leave
 		case commands.Join:
