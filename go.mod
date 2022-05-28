@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/roadrunner-server/api/v2 v2.17.1
 	github.com/roadrunner-server/errors v1.1.2
-	github.com/roadrunner-server/sdk/v2 v2.14.2
+	github.com/roadrunner-server/sdk/v2 v2.14.4
 	github.com/stretchr/testify v1.7.1
 	go.buf.build/protocolbuffers/go/roadrunner-server/api v1.2.3
 	go.opentelemetry.io/otel/trace v1.7.0
