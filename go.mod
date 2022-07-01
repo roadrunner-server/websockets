@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/roadrunner-server/api/v2 v2.18.0
 	github.com/roadrunner-server/errors v1.1.2
-	github.com/roadrunner-server/sdk/v2 v2.16.0
+	github.com/roadrunner-server/sdk/v2 v2.17.3
 	github.com/stretchr/testify v1.8.0
 	go.buf.build/protocolbuffers/go/roadrunner-server/api v1.2.5
 	go.opentelemetry.io/otel/trace v1.7.0
@@ -21,7 +21,7 @@ require (
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/roadrunner-server/goridge/v3 v3.4.4 // indirect
+	github.com/roadrunner-server/goridge/v3 v3.4.5 // indirect
 	github.com/roadrunner-server/tcplisten v1.1.2 // indirect
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
