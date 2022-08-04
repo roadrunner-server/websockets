@@ -1,6 +1,6 @@
 module github.com/roadrunner-server/websockets/v2
 
-go 1.18
+go 1.19
 
 require (
 	github.com/gobwas/ws v1.1.0
@@ -10,7 +10,7 @@ require (
 	github.com/roadrunner-server/errors v1.1.2
 	github.com/roadrunner-server/sdk/v2 v2.18.2
 	github.com/stretchr/testify v1.8.0
-	go.buf.build/protocolbuffers/go/roadrunner-server/api v1.3.10
+	go.buf.build/protocolbuffers/go/roadrunner-server/api v1.3.11
 	go.opentelemetry.io/otel/trace v1.9.0
 	go.uber.org/zap v1.21.0
 )
