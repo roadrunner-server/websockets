@@ -21,8 +21,8 @@ require (
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/roadrunner-server/goridge/v3 v3.4.5 // indirect
-	github.com/roadrunner-server/tcplisten v1.1.2 // indirect
+	github.com/roadrunner-server/goridge/v3 v3.5.0 // indirect
+	github.com/roadrunner-server/tcplisten v1.2.0 // indirect
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.5.0 // indirect
