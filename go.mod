@@ -11,7 +11,7 @@ require (
 	github.com/roadrunner-server/sdk/v2 v2.19.0
 	github.com/stretchr/testify v1.8.0
 	go.buf.build/protocolbuffers/go/roadrunner-server/api v1.3.12
-	go.opentelemetry.io/otel/trace v1.9.0
+	go.opentelemetry.io/otel/trace v1.10.0
 	go.uber.org/zap v1.23.0
 )
 
@@ -27,7 +27,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.5.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	go.opentelemetry.io/otel v1.9.0 // indirect
+	go.opentelemetry.io/otel v1.10.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/sync v0.0.0-20220907140024-f12130a52804 // indirect
