@@ -8,22 +8,18 @@ import (
 	"github.com/gobwas/ws"
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
-	"github.com/roadrunner-server/api/v2/payload"
-	"github.com/roadrunner-server/api/v2/plugins/config"
-	"github.com/roadrunner-server/api/v2/plugins/pubsub"
-	"github.com/roadrunner-server/api/v2/plugins/server"
-	"github.com/roadrunner-server/api/v2/pool"
-	"github.com/roadrunner-server/api/v2/state/process"
-	"github.com/roadrunner-server/api/v2/worker"
 	"github.com/roadrunner-server/errors"
-	poolImpl "github.com/roadrunner-server/sdk/v2/pool"
-	processImpl "github.com/roadrunner-server/sdk/v2/state/process"
-	"github.com/roadrunner-server/sdk/v2/utils"
-	"github.com/roadrunner-server/websockets/v2/attributes"
-	"github.com/roadrunner-server/websockets/v2/connection"
-	"github.com/roadrunner-server/websockets/v2/executor"
-	wsPool "github.com/roadrunner-server/websockets/v2/pool"
-	"github.com/roadrunner-server/websockets/v2/validator"
+	"github.com/roadrunner-server/sdk/v3/payload"
+	"github.com/roadrunner-server/sdk/v3/pool"
+	"github.com/roadrunner-server/sdk/v3/state/process"
+	"github.com/roadrunner-server/sdk/v3/utils"
+	"github.com/roadrunner-server/sdk/v3/worker"
+	"github.com/roadrunner-server/websockets/v3/attributes"
+	"github.com/roadrunner-server/websockets/v3/common"
+	"github.com/roadrunner-server/websockets/v3/connection"
+	"github.com/roadrunner-server/websockets/v3/executor"
+	wsPool "github.com/roadrunner-server/websockets/v3/pool"
+	"github.com/roadrunner-server/websockets/v3/validator"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
@@ -40,9 +36,9 @@ type Plugin struct {
 	sync.RWMutex
 
 	// subscriber+reader interfaces
-	subReader pubsub.SubReader
+	subReader common.SubReader
 	// broadcaster
-	broadcaster pubsub.Broadcaster
+	broadcaster common.Broadcaster
 
 	cfg *Config
 	log *zap.Logger
@@ -56,11 +52,11 @@ type Plugin struct {
 	serveExit chan struct{}
 
 	// workers pool
-	phpPool pool.Pool
+	phpPool common.Pool
 	// payloads pool
 	pldPool sync.Pool
 	// server which produces commands to the pool
-	server server.Server
+	server common.Server
 
 	// stop receiving messages
 	cancel context.CancelFunc
@@ -70,7 +66,7 @@ type Plugin struct {
 	accessValidator validator.AccessValidatorFn
 }
 
-func (p *Plugin) Init(cfg config.Configurer, log *zap.Logger, server server.Server, b pubsub.Broadcaster) error {
+func (p *Plugin) Init(cfg common.Configurer, log *zap.Logger, server common.Server, b common.Broadcaster) error {
 	const op = errors.Op("websockets_plugin_init")
 	if !cfg.Has(PluginName) {
 		return errors.E(op, errors.Disabled)
@@ -124,7 +120,7 @@ func (p *Plugin) Serve() chan error {
 		p.Lock()
 		defer p.Unlock()
 
-		p.phpPool, err = p.server.NewWorkerPool(context.Background(), &poolImpl.Config{
+		p.phpPool, err = p.server.NewPool(context.Background(), &pool.Config{
 			Debug:           p.cfg.Pool.Debug,
 			NumWorkers:      p.cfg.Pool.NumWorkers,
 			MaxJobs:         p.cfg.Pool.MaxJobs,
@@ -143,7 +139,7 @@ func (p *Plugin) Serve() chan error {
 	p.workersPool = wsPool.NewWorkersPool(p.subReader, &p.connections, p.log)
 
 	// we need here only Reader part of the interface
-	go func(ps pubsub.Reader) {
+	go func(ps common.Reader) {
 		for {
 			data, err := ps.Next(p.ctx)
 			if err != nil {
@@ -271,7 +267,7 @@ func (p *Plugin) Workers() []*process.State {
 
 	ps := make([]*process.State, 0, len(workers))
 	for i := 0; i < len(workers); i++ {
-		state, err := processImpl.WorkerProcessState(workers[i])
+		state, err := process.WorkerProcessState(workers[i])
 		if err != nil {
 			return nil
 		}
@@ -282,7 +278,7 @@ func (p *Plugin) Workers() []*process.State {
 }
 
 // internal
-func (p *Plugin) workers() []worker.BaseProcess {
+func (p *Plugin) workers() []*worker.Process {
 	return p.phpPool.Workers()
 }
 
@@ -359,7 +355,7 @@ func (p *Plugin) exec(ctx []byte) (*validator.AccessValidator, error) {
 	pd.Context = ctx
 
 	p.RLock()
-	rsp, err := p.phpPool.Exec(pd)
+	rsp, err := p.phpPool.Exec(context.Background(), pd)
 	p.RUnlock()
 	if err != nil {
 		return nil, errors.E(op, err)

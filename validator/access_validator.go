@@ -9,7 +9,7 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/roadrunner-server/errors"
-	"github.com/roadrunner-server/websockets/v2/attributes"
+	"github.com/roadrunner-server/websockets/v3/attributes"
 )
 
 type AccessValidatorFn = func(r *http.Request, channels ...string) (*AccessValidator, error)

@@ -4,9 +4,10 @@ import (
 	"sync"
 
 	"github.com/goccy/go-json"
-	"github.com/roadrunner-server/api/v2/plugins/pubsub"
-	"github.com/roadrunner-server/sdk/v2/utils"
-	"github.com/roadrunner-server/websockets/v2/connection"
+	"github.com/roadrunner-server/sdk/v3/plugins/pubsub"
+	"github.com/roadrunner-server/sdk/v3/utils"
+	"github.com/roadrunner-server/websockets/v3/common"
+	"github.com/roadrunner-server/websockets/v3/connection"
 	"go.uber.org/zap"
 )
 
@@ -14,12 +15,12 @@ import (
 const workersNum int = 10
 
 type WorkersPool struct {
-	subscriber  pubsub.Subscriber
+	subscriber  common.Subscriber
 	connections *sync.Map
 	resPool     sync.Pool
 	log         *zap.Logger
 
-	queue chan *pubsub.Message
+	queue chan common.Message
 	exit  chan struct{}
 }
 
@@ -27,7 +28,7 @@ type WorkersPool struct {
 func NewWorkersPool(subscriber pubsub.Subscriber, connections *sync.Map, log *zap.Logger) *WorkersPool {
 	wp := &WorkersPool{
 		connections: connections,
-		queue:       make(chan *pubsub.Message, 100),
+		queue:       make(chan common.Message, 100),
 		subscriber:  subscriber,
 		log:         log,
 		exit:        make(chan struct{}),
@@ -45,7 +46,7 @@ func NewWorkersPool(subscriber pubsub.Subscriber, connections *sync.Map, log *za
 	return wp
 }
 
-func (wp *WorkersPool) Queue(msg *pubsub.Message) {
+func (wp *WorkersPool) Queue(msg common.Message) {
 	wp.queue <- msg
 }
 
@@ -84,7 +85,7 @@ func (wp *WorkersPool) do() { //nolint:gocognit
 				if !ok {
 					return
 				}
-				if msg == nil || msg.Topic == "" {
+				if msg == nil || msg.Topic() == "" {
 					continue
 				}
 
@@ -92,10 +93,10 @@ func (wp *WorkersPool) do() { //nolint:gocognit
 				res := wp.get()
 
 				// get connections for the particular topic
-				wp.subscriber.Connections(msg.Topic, res)
+				wp.subscriber.Connections(msg.Topic(), res)
 
 				if len(res) == 0 {
-					wp.log.Info("no connections associated with provided topic", zap.String("topic", msg.Topic))
+					wp.log.Info("no connections associated with provided topic", zap.String("topic", msg.Topic()))
 					wp.put(res)
 					continue
 				}
@@ -104,14 +105,14 @@ func (wp *WorkersPool) do() { //nolint:gocognit
 				for connID := range res {
 					c, ok := wp.connections.Load(connID)
 					if !ok {
-						wp.log.Warn("websocket was disconnected before the message being written to it", zap.String("topics", msg.Topic))
+						wp.log.Warn("websocket was disconnected before the message being written to it", zap.String("topics", msg.Topic()))
 						wp.put(res)
 						continue
 					}
 
 					d, err := json.Marshal(&Response{
-						Topic:   msg.Topic,
-						Payload: utils.AsString(msg.Payload),
+						Topic:   msg.Topic(),
+						Payload: utils.AsString(msg.Payload()),
 					})
 
 					if err != nil {
@@ -123,7 +124,7 @@ func (wp *WorkersPool) do() { //nolint:gocognit
 					// put data into the bytes buffer
 					err = c.(*connection.Connection).Write(d)
 					if err != nil {
-						wp.log.Error("error sending payload over the connection", zap.String("topic", msg.Topic), zap.Error(err))
+						wp.log.Error("error sending payload over the connection", zap.String("topic", msg.Topic()), zap.Error(err))
 						wp.put(res)
 						continue
 					}

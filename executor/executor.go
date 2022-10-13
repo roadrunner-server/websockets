@@ -7,11 +7,11 @@ import (
 
 	"github.com/gobwas/ws"
 	"github.com/goccy/go-json"
-	"github.com/roadrunner-server/api/v2/plugins/pubsub"
 	"github.com/roadrunner-server/errors"
-	"github.com/roadrunner-server/websockets/v2/commands"
-	"github.com/roadrunner-server/websockets/v2/connection"
-	"github.com/roadrunner-server/websockets/v2/validator"
+	"github.com/roadrunner-server/websockets/v3/commands"
+	"github.com/roadrunner-server/websockets/v3/common"
+	"github.com/roadrunner-server/websockets/v3/connection"
+	"github.com/roadrunner-server/websockets/v3/validator"
 	websocketsProto "go.buf.build/protocolbuffers/go/roadrunner-server/api/proto/websockets/v1"
 	"go.uber.org/zap"
 )
@@ -37,7 +37,7 @@ type Executor struct {
 	connID string
 
 	// subscriber drivers
-	sub          pubsub.Subscriber
+	sub          common.Subscriber
 	actualTopics map[string]struct{}
 
 	req             *http.Request
@@ -46,7 +46,7 @@ type Executor struct {
 
 // NewExecutor creates protected connection and starts command loop
 func NewExecutor(conn *connection.Connection, log *zap.Logger,
-	connID string, sub pubsub.Subscriber, av validator.AccessValidatorFn, r *http.Request) *Executor {
+	connID string, sub common.Subscriber, av validator.AccessValidatorFn, r *http.Request) *Executor {
 	return &Executor{
 		conn:            conn,
 		connID:          connID,
