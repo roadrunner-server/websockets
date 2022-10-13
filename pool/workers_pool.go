@@ -6,7 +6,6 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/roadrunner-server/sdk/v3/plugins/pubsub"
 	"github.com/roadrunner-server/sdk/v3/utils"
-	"github.com/roadrunner-server/websockets/v3/common"
 	"github.com/roadrunner-server/websockets/v3/connection"
 	"go.uber.org/zap"
 )
@@ -15,12 +14,12 @@ import (
 const workersNum int = 10
 
 type WorkersPool struct {
-	subscriber  common.Subscriber
+	subscriber  pubsub.Subscriber
 	connections *sync.Map
 	resPool     sync.Pool
 	log         *zap.Logger
 
-	queue chan common.Message
+	queue chan pubsub.Message
 	exit  chan struct{}
 }
 
@@ -28,7 +27,7 @@ type WorkersPool struct {
 func NewWorkersPool(subscriber pubsub.Subscriber, connections *sync.Map, log *zap.Logger) *WorkersPool {
 	wp := &WorkersPool{
 		connections: connections,
-		queue:       make(chan common.Message, 100),
+		queue:       make(chan pubsub.Message, 100),
 		subscriber:  subscriber,
 		log:         log,
 		exit:        make(chan struct{}),
@@ -46,7 +45,7 @@ func NewWorkersPool(subscriber pubsub.Subscriber, connections *sync.Map, log *za
 	return wp
 }
 
-func (wp *WorkersPool) Queue(msg common.Message) {
+func (wp *WorkersPool) Queue(msg pubsub.Message) {
 	wp.queue <- msg
 }
 

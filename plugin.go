@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/roadrunner-server/errors"
 	"github.com/roadrunner-server/sdk/v3/payload"
+	"github.com/roadrunner-server/sdk/v3/plugins/pubsub"
 	"github.com/roadrunner-server/sdk/v3/pool"
 	"github.com/roadrunner-server/sdk/v3/state/process"
 	"github.com/roadrunner-server/sdk/v3/utils"
@@ -36,9 +37,9 @@ type Plugin struct {
 	sync.RWMutex
 
 	// subscriber+reader interfaces
-	subReader common.SubReader
+	subReader pubsub.SubReader
 	// broadcaster
-	broadcaster common.Broadcaster
+	broadcaster pubsub.Broadcaster
 
 	cfg *Config
 	log *zap.Logger
@@ -66,7 +67,7 @@ type Plugin struct {
 	accessValidator validator.AccessValidatorFn
 }
 
-func (p *Plugin) Init(cfg common.Configurer, log *zap.Logger, server common.Server, b common.Broadcaster) error {
+func (p *Plugin) Init(cfg common.Configurer, log *zap.Logger, server common.Server, b pubsub.Broadcaster) error {
 	const op = errors.Op("websockets_plugin_init")
 	if !cfg.Has(PluginName) {
 		return errors.E(op, errors.Disabled)
@@ -139,7 +140,7 @@ func (p *Plugin) Serve() chan error {
 	p.workersPool = wsPool.NewWorkersPool(p.subReader, &p.connections, p.log)
 
 	// we need here only Reader part of the interface
-	go func(ps common.Reader) {
+	go func(ps pubsub.Reader) {
 		for {
 			data, err := ps.Next(p.ctx)
 			if err != nil {
