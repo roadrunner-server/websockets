@@ -9,7 +9,7 @@ require (
 	github.com/roadrunner-server/errors v1.2.0
 	github.com/roadrunner-server/sdk/v3 v3.0.0-beta.4
 	github.com/stretchr/testify v1.8.1
-	go.buf.build/protocolbuffers/go/roadrunner-server/api v1.3.18
+	go.buf.build/protocolbuffers/go/roadrunner-server/api v1.3.20
 	go.opentelemetry.io/otel/trace v1.11.1
 	go.uber.org/zap v1.23.0
 )
