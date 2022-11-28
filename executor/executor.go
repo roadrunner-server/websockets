@@ -12,7 +12,7 @@ import (
 	"github.com/roadrunner-server/websockets/v3/commands"
 	"github.com/roadrunner-server/websockets/v3/connection"
 	"github.com/roadrunner-server/websockets/v3/validator"
-	websocketsProto "go.buf.build/protocolbuffers/go/roadrunner-server/api/proto/websockets/v1"
+	websocketsProto "go.buf.build/protocolbuffers/go/roadrunner-server/api/websockets/v1"
 	"go.uber.org/zap"
 )
 
